@@ -7,8 +7,8 @@ def test_add_project(app):
     password = app.config['webadmin']['password']
     ind = str(randrange(0, 99))
     project = Project(name="Project " + ind, description="Project " + ind + " description")
-    old_projects = app.soap.get_project_list(username, password)
+    old_projects = Project.convert_project_list_from_mantis_to_model(app.soap.get_project_list(username, password))
     app.project.create(project)
-    new_projects = app.soap.get_project_list(username, password)
     old_projects.append(project)
-    old_projects == new_projects
+    new_projects = Project.convert_project_list_from_mantis_to_model(app.soap.get_project_list(username, password))
+    assert sorted(old_projects, key=Project.id_or_max) == sorted(new_projects, key=Project.id_or_max)
